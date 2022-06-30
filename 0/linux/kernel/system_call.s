@@ -65,7 +65,7 @@ nr_system_calls = 92
  * strange reason. Urgel. Now I just ignore them.
  */
 .globl system_call,sys_fork,timer_interrupt,sys_execve,sys_execve2
-.globl hd_interrupt,floppy_interrupt,parallel_interrupt
+.globl hd_interrupt,floppy_interrupt,parallel_interrupt,ne2k_interrupt
 .globl device_not_available, coprocessor_error
 
 .align 4
@@ -290,4 +290,11 @@ parallel_interrupt:
 	movb $0x20,%al
 	outb %al,$0x20
 	popl %eax
+	iret
+.align 4
+ne2k_interrupt:
+	call ne2k_handler
+	movb $0x20, % al
+	outb %al,$0xa0
+	outb %al,$0x20
 	iret
