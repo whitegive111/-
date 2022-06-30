@@ -1,7 +1,7 @@
 # 扩展实验二
 实现简单的网络功能（这实验巨多而且很坑）
 
-1.先检验linux是否有tun/tap功能，如无，在网上照流程安装。
+1.先检验linux是否有tun/tap功能，如无，在网上照流程安装，可借鉴https://blog.csdn.net/lishuhuakai/article/details/70305543
 
 2.首先修改conf/0.11.bxrc文件，如下
 pci: enabled=1, chipset=i440fx,slot2=ne2k
