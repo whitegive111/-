@@ -39,6 +39,8 @@ __always_inline _syscall0(int,sync)
 
 #include <linux/fs.h>
 
+#include <linux/ne2k.h>
+
 static char printbuf[1024];
 
 extern int vsprintf();
@@ -133,8 +135,7 @@ void main(void)		/* This really IS void, no error here. */
 	buffer_init(buffer_memory_end);
 	hd_init();
 	floppy_init();
-	int i;
-	unsigned short prom[6];
+	ne2k_init();
 	sti();
 	move_to_user_mode();
 	if (!fork()) {		/* we count on this going ok */
