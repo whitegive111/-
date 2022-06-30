@@ -8,20 +8,20 @@
 #include <linux/ne2k.h>
 
 extern void ne2k_interrupt(void);
-//Íø¿¨³õÊ¼»¯
+//ç½‘å¡åˆå§‹åŒ–
 void ne2k_init(void)
 {
     int i;
     ne2k.iobase = NE_IOBASE;
     ne2k.irq = NE_IRQ;
-    ne2k.membase = 16*1024;//BUFFER RAM (°üÀ¨½ÓÊÕ»º´æºÍ·¢ËÍ»º´æ)µÄ¿ªÊ¼Î»ÖÃ,0x4000,16KB´¦ 
-    ne2k.memsize = 16*1024; //BUFFER RAM µÄ´óĞ¡
+    ne2k.membase = 16*1024;//BUFFER RAM (åŒ…æ‹¬æ¥æ”¶ç¼“å­˜å’Œå‘é€ç¼“å­˜)çš„å¼€å§‹ä½ç½®,0x4000,16KBå¤„ 
+    ne2k.memsize = 16*1024; //BUFFER RAM çš„å¤§å°
     ne2k.rx_page_start = ne2k.membase/NE_PAGE_SIZE;
-    //½ÓÊÕ»º´æ¿ªÊ¼Î»ÖÃ
+    //æ¥æ”¶ç¼“å­˜å¼€å§‹ä½ç½®
     ne2k.rx_page_stop = ne2k.rx_page_start + ne2k.memsize/NE_PAGE_SIZE- NE_TXBUF_SIZE * NE_TX_BUFERS;
-    //½ÓÊÕ»º´æ½áÊøÎ»ÖÃ
+    //æ¥æ”¶ç¼“å­˜ç»“æŸä½ç½®
     ne2k.next_packet = ne2k.rx_page_start + 1;
-    //ÏÂÒ»¸öÎ´¶ÁµÄÊı¾İ°üÔÚBNDY+1 ´¦
+    //ä¸‹ä¸€ä¸ªæœªè¯»çš„æ•°æ®åŒ…åœ¨BNDY+1 å¤„
     ne2k.paddr.bytes[0]=0x00;
     ne2k.paddr.bytes[1]=0x0c;
     ne2k.paddr.bytes[2]=0x29;
@@ -29,73 +29,73 @@ void ne2k_init(void)
     ne2k.paddr.bytes[4]=0xf8;
     ne2k.paddr.bytes[5]=0xbd;
 
-    //ÏÖÔÚBUFFER_RAMÒÑ¾­·Ö¸îºÃ£¬½ÓÏÂÀ´¿ªÊ¼ÉèÖÃ¼Ä´æÆ÷Ò³ÉÏµÄ¸÷ÖÖ¼Ä´æÆ÷
+    //ç°åœ¨BUFFER_RAMå·²ç»åˆ†å‰²å¥½ï¼Œæ¥ä¸‹æ¥å¼€å§‹è®¾ç½®å¯„å­˜å™¨é¡µä¸Šçš„å„ç§å¯„å­˜å™¨
     outb(NE_CR_RD2|NE_CR_STP, ne2k.iobase+NE_P0_CR);
-    //ÉèÖÃ¼Ä´æÆ÷Ò³0ÉÏµÄCOMMAND¼Ä´æÆ÷£¬Ñ¡Ôñ²¢×¼±¸Ğ´¼Ä´æÆ÷Ò³0
+    //è®¾ç½®å¯„å­˜å™¨é¡µ0ä¸Šçš„COMMANDå¯„å­˜å™¨ï¼Œé€‰æ‹©å¹¶å‡†å¤‡å†™å¯„å­˜å™¨é¡µ0
     outb(ne2k.rx_page_start, ne2k.iobase+NE_P0_PSTART);
-    //ÉèÖÃPSTART
+    //è®¾ç½®PSTART
     outb(ne2k.rx_page_stop, ne2k.iobase+NE_P0_PSTOP);
-    //ÉèÖÃPSTOP
+    //è®¾ç½®PSTOP
     outb(ne2k.rx_page_start, ne2k.iobase+NE_P0_BNRY);
-    //ÉèÖÃBNRY
+    //è®¾ç½®BNRY
 
     outb(NE_CR_PAGE1|NE_CR_RD2|NE_CR_STP, ne2k.iobase+NE_P0_CR);
-    //ÉèÖÃ¼Ä´æÆ÷Ò³0ÉÏµÄCOMMAND¼Ä´æÆ÷£¬Ñ¡Ôñ²¢×¼±¸Ğ´¼Ä´æÆ÷Ò³1
+    //è®¾ç½®å¯„å­˜å™¨é¡µ0ä¸Šçš„COMMANDå¯„å­˜å™¨ï¼Œé€‰æ‹©å¹¶å‡†å¤‡å†™å¯„å­˜å™¨é¡µ1
     outb(ne2k.next_packet, ne2k.iobase+NE_P1_CURR);
-    //ÉèÖÃCURR¼Ä´æÆ÷
+    //è®¾ç½®CURRå¯„å­˜å™¨
     for(i=0;i<6;i++)
         outb(ne2k.paddr.bytes[i], ne2k.iobase + NE_P1_PAR0 + i);
-        //i=0..5£¬½«MACµØÖ·±£´æÔÚ¼Ä´æÆ÷Ò³1¶ÔÓ¦µÄ¶Ë¿Ú
+        //i=0..5ï¼Œå°†MACåœ°å€ä¿å­˜åœ¨å¯„å­˜å™¨é¡µ1å¯¹åº”çš„ç«¯å£
     for(i=0;i<8;i++)
         outb(0, ne2k.iobase + NE_P1_MAR0 + i);
-        //i=0..7£¬ÉèÖÃ¶à²¥µØÖ·£¬¶ÔÓÚ±¾ÊµÑéÎŞÓ°Ïì£¬ÓÚÊÇÖÃ0
+        //i=0..7ï¼Œè®¾ç½®å¤šæ’­åœ°å€ï¼Œå¯¹äºæœ¬å®éªŒæ— å½±å“ï¼Œäºæ˜¯ç½®0
     outb(NE_CR_RD2|NE_CR_STP, ne2k.iobase+NE_P0_CR);
-    //ÉèÖÃ¼Ä´æÆ÷Ò³1ÉÏµÄCOMMAND¼Ä´æÆ÷£¬Ñ¡Ôñ²¢×¼±¸Ğ´¼Ä´æÆ÷Ò³0
+    //è®¾ç½®å¯„å­˜å™¨é¡µ1ä¸Šçš„COMMANDå¯„å­˜å™¨ï¼Œé€‰æ‹©å¹¶å‡†å¤‡å†™å¯„å­˜å™¨é¡µ0
     outb(NE_RCR_AB, ne2k.iobase + NE_P0_RCR); 
-    //ÔÊĞí¹ã²¥
+    //å…è®¸å¹¿æ’­
     outb(NE_DCR_WTS,ne2k.iobase+NE_P0_DCR);
-    //ÒÔ×ÖÎªµ¥Î»ÊÕ·¢£¬°´Ğ¡¶ËĞòÀ´·ÅÖÃ×Ö½Ú
+    //ä»¥å­—ä¸ºå•ä½æ”¶å‘ï¼ŒæŒ‰å°ç«¯åºæ¥æ”¾ç½®å­—èŠ‚
 
-    //½«Ô¶³ÌDMAµÄ¼ÆÊıÖµ³õÊ¼»¯Îª0£¬¸æËßÍø¿¨ÏÖÔÚ²»ĞèÒª·ÃÎÊÖ÷´æ£¬Æô¶¯Íø¿¨ÊÕ·¢Êı¾İ°ü
+    //å°†è¿œç¨‹DMAçš„è®¡æ•°å€¼åˆå§‹åŒ–ä¸º0ï¼Œå‘Šè¯‰ç½‘å¡ç°åœ¨ä¸éœ€è¦è®¿é—®ä¸»å­˜ï¼Œå¯åŠ¨ç½‘å¡æ”¶å‘æ•°æ®åŒ…
     outb(0,ne2k.iobase+NE_P0_RBCR0);
     outb(0,ne2k.iobase+NE_P0_RBCR1);
     outb(NE_CR_RD2|NE_CR_STA,ne2k.iobase+NE_P0_CR);
 
-    set_trap_gate(0x2b, &ne2k_interrupt); //ÖĞ¶ÏÈë¿ÚÉèÖÃ
+    set_trap_gate(0x2b, &ne2k_interrupt); //ä¸­æ–­å…¥å£è®¾ç½®
     outb_p(inb_p(0x21) & 0xFB, 0x21);
-    outb_p(inb_p(0xa1) & 0x7F, 0xA1); //·¢ËÍOCW½«ÆÁ±Î´ò¿ª
+    outb_p(inb_p(0xa1) & 0x7F, 0xA1); //å‘é€OCWå°†å±è”½æ‰“å¼€
 
-    outb(NE_IMR_PRXE, ne2k.iobase + NE_P0_IMR);//ÔÊĞíÊı¾İ°ü½ÓÊÕÖĞ¶ÏµÄ´¥·¢
+    outb(NE_IMR_PRXE, ne2k.iobase + NE_P0_IMR);//å…è®¸æ•°æ®åŒ…æ¥æ”¶ä¸­æ–­çš„è§¦å‘
 
 }
 
-//Íø¿¨·¢ËÍÎïÀíÖ¡µÄ´úÂëÊµÏÖ£¨µÚÒ»²½£º½«ÎïÀíÖ¡·ÅÈëÍø¿¨µÄ·¢ËÍ»º³åÇø£©
+//ç½‘å¡å‘é€ç‰©ç†å¸§çš„ä»£ç å®ç°ï¼ˆç¬¬ä¸€æ­¥ï¼šå°†ç‰©ç†å¸§æ”¾å…¥ç½‘å¡çš„å‘é€ç¼“å†²åŒºï¼‰
 int ne2k_transmit(struct pbuf *p)
 {
     unsigned short packetlen = 48;
-    //ARPÊı¾İ°üµÄÒÔÌ«ÍøÎïÀíÖ¡³¤¶ÈÎª48¸ö×Ö½Ú
+    //ARPæ•°æ®åŒ…çš„ä»¥å¤ªç½‘ç‰©ç†å¸§é•¿åº¦ä¸º48ä¸ªå­—èŠ‚
     unsigned char status;
     int i;
     outb(NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);
-    //Ê×ÏÈÖÕÖ¹Ô¶³ÌDMA
+    //é¦–å…ˆç»ˆæ­¢è¿œç¨‹DMA
     outb((unsigned char) packetlen, ne2k.iobase + NE_P0_RBCR0);
     outb((unsigned char) (packetlen >> 8), ne2k.iobase +NE_P0_RBCR1);
-    //¼ÇÂ¼ÒªÔ¶³ÌĞ´µÄÄÚÈİ³¤¶È
-    unsigned short dst = ne2k.rx_page_stop;//·¢ËÍ»º³åÇøÔÚ½ÓÊÕ»º³åÇøºó
-    //·¢ËÍ»º´æÇøµÄ¿ªÊ¼µØÖ·
+    //è®°å½•è¦è¿œç¨‹å†™çš„å†…å®¹é•¿åº¦
+    unsigned short dst = ne2k.rx_page_stop;//å‘é€ç¼“å†²åŒºåœ¨æ¥æ”¶ç¼“å†²åŒºå
+    //å‘é€ç¼“å­˜åŒºçš„å¼€å§‹åœ°å€
     outb((unsigned char) (dst * NE_PAGE_SIZE), ne2k.iobase + NE_P0_RSAR0);
     outb((unsigned char) ((dst * NE_PAGE_SIZE) >> 8), ne2k.iobase + NE_P0_RSAR1);
-    //¼ÇÂ¼ÒªÔ¶³ÌĞ´µÄÄ¿±êµØÖ·
+    //è®°å½•è¦è¿œç¨‹å†™çš„ç›®æ ‡åœ°å€
     outb(NE_CR_RD1 | NE_CR_STA, ne2k.iobase + NE_P0_CR);
-    for(i=0;i<48/2;i++) outw(*(unsigned short*)(p->payload), ne2k.iobase + NE_DATAPORT);//ÏòÊı¾İ¶Ë¿ÚĞ´ÈëµÄÃ¿¸ö×Ö»á×Ô¶¯·ÅÖÃµ½BUFFER RAMÖĞÒÔdst¿ªÊ¼ÇÒ³¤¶ÈÎªpacketlenµÄÒ»¶Î´¢´æÇøÓò
-    //?? ÊÇARPÎïÀíÖ¡µÄ¸÷¸ö×Ö
+    for(i=0;i<48/2;i++) outw(*(unsigned short*)(p->payload), ne2k.iobase + NE_DATAPORT);//å‘æ•°æ®ç«¯å£å†™å…¥çš„æ¯ä¸ªå­—ä¼šè‡ªåŠ¨æ”¾ç½®åˆ°BUFFER RAMä¸­ä»¥dstå¼€å§‹ä¸”é•¿åº¦ä¸ºpacketlençš„ä¸€æ®µå‚¨å­˜åŒºåŸŸ
+    //?? æ˜¯ARPç‰©ç†å¸§çš„å„ä¸ªå­—
     while((status = inb(ne2k.iobase + NE_P0_ISR) & 0x40) == 0);
 
-    //Íø¿¨·¢ËÍÎïÀíÖ¡µÄ´úÂëÊµÏÖ£¨µÚ¶ş²½£º¸øÍø¿¨·¢ËÍÊı¾İ´«ÊäÃüÁî
+    //ç½‘å¡å‘é€ç‰©ç†å¸§çš„ä»£ç å®ç°ï¼ˆç¬¬äºŒæ­¥ï¼šç»™ç½‘å¡å‘é€æ•°æ®ä¼ è¾“å‘½ä»¤
     outb((unsigned char) dst, ne2k.iobase + NE_P0_TPSR);
     if (packetlen > 60) {
-    //ÎïÀíÖ¡ÖĞµÄÊı¾İÄÚÈİĞ¡ÓÚ46BÊ±£¬±ØĞë²¹³äÍêÕû£¬¼ÓÉÏÖ¡Í·
-    //ÕıºÃ60B
+    //ç‰©ç†å¸§ä¸­çš„æ•°æ®å†…å®¹å°äº46Bæ—¶ï¼Œå¿…é¡»è¡¥å……å®Œæ•´ï¼ŒåŠ ä¸Šå¸§å¤´
+    //æ­£å¥½60B
         outb(packetlen, ne2k.iobase + NE_P0_TBCR0);
         outb(packetlen >> 8,ne2k.iobase + NE_P0_TBCR1);
     }
@@ -103,14 +103,14 @@ int ne2k_transmit(struct pbuf *p)
         outb(60, ne2k.iobase + NE_P0_TBCR0);
         outb(0, ne2k.iobase + NE_P0_TBCR1);
     }
-    outb(NE_CR_RD2 | NE_CR_TXP | NE_CR_STA, ne2k.iobase + NE_P0_CR);//·¢ËÍÊı¾İ°ü
+    outb(NE_CR_RD2 | NE_CR_TXP | NE_CR_STA, ne2k.iobase + NE_P0_CR);//å‘é€æ•°æ®åŒ…
 }
 
-//½ÓÊÕÊı¾İ°ü
+//æ¥æ”¶æ•°æ®åŒ…
 void ne2k_handler(void)
 {
     unsigned char status;
-	outb(NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);//Ñ¡¼Ä´æÆ÷Ò³0
+	outb(NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);//é€‰å¯„å­˜å™¨é¡µ0
 	while ((status = inb(ne2k.iobase + NE_P0_ISR)) != 0) {
 		outb(status, ne2k.iobase + NE_P0_ISR);
 		if (status & NE_ISR_PRX) {
@@ -127,23 +127,23 @@ void ne2k_receive(void)
 	unsigned char bndry;
     unsigned char *pbuf;
 	outb(NE_CR_PAGE1 | NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);
-	//ÒòÎªNE_P1_CURRÔÚ¼Ä´æÆ÷Ò³1ÉÏ
+	//å› ä¸ºNE_P1_CURRåœ¨å¯„å­˜å™¨é¡µ1ä¸Š
 	while (ne2k.next_packet != inb(ne2k.iobase + NE_P1_CURR))
 	{
 		packet_ptr = ne2k.next_packet * NE_PAGE_SIZE;
-        //ÀûÓÃÊı¾İ¶Ë¿Ú´Ópacket_ptrµØÖ·´¦¶Á³ö4¸ö×Ö½Úµ½packet_hdrÖĞ
+        //åˆ©ç”¨æ•°æ®ç«¯å£ä»packet_ptråœ°å€å¤„è¯»å‡º4ä¸ªå­—èŠ‚åˆ°packet_hdrä¸­
 		len = packet_hdr.recv_count - sizeof(struct recv_ring_desc);
 		pbuf = malloc(len);
 		packet_ptr += sizeof(struct recv_ring_desc);
-        //ÕæÕıµÄÊı¾İ°üÄÚÈİÀûÓÃÊı¾İ¶Ë¿Ú´Ópacket_ptrµØÖ·´¦¶Á³öpacketlen/2¸ö×Öµ½pbufÖĞ£»
+        //çœŸæ­£çš„æ•°æ®åŒ…å†…å®¹åˆ©ç”¨æ•°æ®ç«¯å£ä»packet_ptråœ°å€å¤„è¯»å‡ºpacketlen/2ä¸ªå­—åˆ°pbufä¸­ï¼›
 		ne2k.next_packet = packet_hdr.next_packet;
 		outb(NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);
-            //¸Ä»ØÒ³0£¬ÒòÎªNE_PO_BNRYÔÚpage 0ÉÏ
+            //æ”¹å›é¡µ0ï¼Œå› ä¸ºNE_PO_BNRYåœ¨page 0ä¸Š
 		bndry = ne2k.next_packet - 1;
 		if (bndry < ne2k.rx_page_start) bndry = ne2k.rx_page_stop - 1;
 		outb(bndry, ne2k.iobase + NE_P0_BNRY);
         
         outb(NE_CR_PAGE1 | NE_CR_RD2 | NE_CR_STA, ne2k.iobase + NE_P0_CR);
-        //ÔÙ¸Ä»Øµ½Ò³1£¬ÒòÎªNE_P1_CURRÔÚÒ³1ÉÏ
+        //å†æ”¹å›åˆ°é¡µ1ï¼Œå› ä¸ºNE_P1_CURRåœ¨é¡µ1ä¸Š
 	}
 }
