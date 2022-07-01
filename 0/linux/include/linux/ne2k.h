@@ -67,7 +67,7 @@
 #define NE_ISR_PRX 0x01 //接收到一个数据包
 #define NE_ISR_RDC 0x40 //远程DMA结束以后会设置这个位
 
-extern void ne2k_init(void);
+
 //网卡管理数据结构定义
 struct macaddr {
     unsigned char bytes[6];
@@ -85,11 +85,11 @@ struct ne {
 
 //ARP数据包和以太网物理帧包头的数据结构定义
 typedef struct arphdr {
-    unsigned short htype;
-    unsigned short ptype;
-    unsigned char hlen;
-    unsigned char plen;
-    unsigned short oper;
+    unsigned short htype;//硬件类型
+    unsigned short ptype;//协议类型
+    unsigned char hlen;//MAC地址长度
+    unsigned char plen;//IP地址长度
+    unsigned short oper;//操作，为1表示为ARP请求数据包，为2表示为ARP应答数据包
     unsigned char sha[ETHER_ADDR_LEN]; //发送端硬件地址
     unsigned char spa[LOGIC_ADDR_LEN]; //发送端IP地址
     unsigned char tha[ETHER_ADDR_LEN]; //目标端硬件地址
@@ -136,5 +136,9 @@ struct recv_ring_desc{
 };
 
 struct ne ne2k; //一个全局数据结构记录NE2000的基本信息
-
+extern void ne2k_init(void);
+extern void arphdr_alloc(arphdr_t *arp);
+extern void etherhdr_alloc(etherhdr_t *eth);
+extern struct pbuf* pbuf_alloc(void);
+extern int ne2k_transmit(struct pbuf *p);
 #endif
