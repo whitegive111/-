@@ -1,7 +1,7 @@
 # 扩展实验二
 实现简单的网络功能（这实验巨多而且很坑）
 
-1.先检验linux是否有tun/tap功能，如无，可尝试修改/etc/network/interfaces文件来配置bochs的IP地址，或者在网上照流程安装tuntap，可借鉴https://blog.csdn.net/lishuhuakai/article/details/70305543（但本人安装后版本不兼容用不了）
+1.先检验linux是否有tun/tap功能，如无，可尝试修改/etc/network/interfaces文件来配置bochs的IP地址（但不知道通过这种方法设置的IP地址能不能用），或者在网上照流程安装tuntap，可借鉴https://blog.csdn.net/lishuhuakai/article/details/70305543（但本人安装后版本不兼容用不了）。
 
 2.首先修改conf/0.11.bxrc文件，如下
 pci: enabled=1, chipset=i440fx,slot2=ne2k
